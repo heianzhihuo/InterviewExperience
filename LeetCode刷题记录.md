@@ -1,5 +1,7 @@
 # LeetCode刷题记录和总结
 
+为了简单表示，不再复制题目，我简述题目要求即可
+
 ## 1046. Last Stone Weight
 > We have a collection of rocks, each rock has a positive integer weight.
 > Each turn, we choose the two heaviest rocks and smash them together.  Suppose the stones have weights x and y with x <= y.  The result of this smash is:
@@ -24,7 +26,7 @@
 
 最小堆的插入和删除和最大堆同理，总结就是插入和删除操作都是在数组尾部进行的，不同的是，插入是自下而上调整堆，删除是自上而下调整堆。
 
-```
+```java
 /*手撸Java最大堆*/
 class MaxHeap{
 	List<Integer> heap = new ArrayList<>();
@@ -62,4 +64,46 @@ class MaxHeap{
 	}
 }
 ```
+
+## [378. Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
+- 找出有序NxN矩阵中第k小的数，其中矩阵中的数从上往下，从左到右是递增的
+- 思想：**分治**,**二分查找**
+- 在有序数组中找第k小的数的方法是按数组的中位数将数组划分成两部分
+- 这里的分治则是按照极大值和极小值的中间的数将数组划分成两部分
+```java
+	/*378. Kth Smallest Element in a Sorted Matrix*/
+    public int kthSmallest(int[][] matrix, int k) {
+        int n = matrix.length;
+        int low = matrix[0][0],high = matrix[n-1][n-1];
+        while(low<=high){
+            int mid  = low+(high-low)/2;//注意：这里不能用(low+high)/2，因为溢出了
+            int count =  getLessEqual(matrix,mid);
+            if(count<k) low = mid +1;
+            else high = mid -1;
+        }
+        return low;
+    }
+    int getLessEqual(int[][] matrix,int val){
+        int n = matrix.length;
+        int i = n-1,j = 0,res = 0;
+        while(i>=0 && j<n){
+            if(matrix[i][j]>val) i--;
+            else{
+                res += i+1;//第j列的matrix[0][j]...matrix[i][j]都比val小
+                j++;
+            }
+            
+        }
+        return res;
+    }
+```
+
+## [218. The Skyline Problem](https://leetcode.com/problems/the-skyline-problem/)
+- 三元组[Li,Ri,Hi]，Li和Ri为横坐标，Hi为高度，即x轴和Li到Ri范围内围成了一个矩形
+- 给了多个这样的三元组，求这些三元组围成的矩形的轮廓，给定的三元组按Li从小到大排列
+- ![图片展示](https://leetcode.com/static/images/problemset/skyline1.jpg "矩形")
+- ![图片展示](https://leetcode.com/static/images/problemset/skyline2.jpg "矩形轮廓的点")
+
+提示是栈、分治、分段树，个人想法是和凸包问题相似
+一个思路，先把所有矩形的四个顶点找出来，以x和y排序，还是没有思路，未完成
 
