@@ -2,7 +2,87 @@
 
 为了简单表示，不再复制题目，我简述题目要求即可
 
-## 1046. Last Stone Weight
+## [300. Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/)
+- 最长递增子串
+- 
+```java
+	public int lengthOfLIS(int[] nums) {
+        int n = nums.length;
+        if(n==0)
+            return 0;
+        int result[] = new int[n];
+        // result[0] = 1;
+        int i,j;
+        for(i=0;i<n;i++){
+            result[i] = 1;
+            for(j=0;j<i;j++)
+                if(nums[i]>nums[j] && result[j]+1>result[i])
+                    result[i] = result[j]+1;
+        }
+        int len = 0;
+        for(i=0;i<n;i++)
+            if(result[i]>len)
+                len = result[i];
+        return len;
+    }
+```
+
+
+## [409. Longest Palindrome](https://leetcode.com/problems/longest-palindrome/)
+- 最长回文串，给定一个字符串s，求用s中字母能组成的最长回文串的长度
+- 思路：统计字符串s中出现次数为奇数次的字母的个数
+```java
+	/*409. Longest Palindrome*/
+    public int longestPalindrome(String s) {
+        int count[] = new int[128];
+        int i;
+        for(i=0;i<s.length();i++)
+            count[s.charAt(i)]++;
+        int result = 0;
+        for(i=0;i<128;i++)
+            if(count[i]%2==1)
+                result++;
+        if(result!=0)
+            return s.length()-result+1;
+        return s.length();
+    }
+```
+
+## [378. Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
+- 找出有序NxN矩阵中第k小的数，其中矩阵中的数从上往下，从左到右是递增的
+- 思想：**分治**,**二分查找**
+- 在有序数组中找第k小的数的方法是按数组的中位数将数组划分成两部分
+- 这里的分治则是按照极大值和极小值的中间的数将数组划分成两部分
+```java
+	/*378. Kth Smallest Element in a Sorted Matrix*/
+    public int kthSmallest(int[][] matrix, int k) {
+        int n = matrix.length;
+        int low = matrix[0][0],high = matrix[n-1][n-1];
+        while(low<=high){
+            int mid  = low+(high-low)/2;//注意：这里不能用(low+high)/2，因为溢出了
+            int count =  getLessEqual(matrix,mid);
+            if(count<k) low = mid +1;
+            else high = mid -1;
+        }
+        return low;
+    }
+    int getLessEqual(int[][] matrix,int val){
+        int n = matrix.length;
+        int i = n-1,j = 0,res = 0;
+        while(i>=0 && j<n){
+            if(matrix[i][j]>val) i--;
+            else{
+                res += i+1;//第j列的matrix[0][j]...matrix[i][j]都比val小
+                j++;
+            }
+            
+        }
+        return res;
+    }
+```
+
+
+## [1046. Last Stone Weight](https://leetcode.com/problems/last-stone-weight/)
 > We have a collection of rocks, each rock has a positive integer weight.
 > Each turn, we choose the two heaviest rocks and smash them together.  Suppose the stones have weights x and y with x <= y.  The result of this smash is:
 
@@ -65,38 +145,6 @@ class MaxHeap{
 }
 ```
 
-## [378. Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
-- 找出有序NxN矩阵中第k小的数，其中矩阵中的数从上往下，从左到右是递增的
-- 思想：**分治**,**二分查找**
-- 在有序数组中找第k小的数的方法是按数组的中位数将数组划分成两部分
-- 这里的分治则是按照极大值和极小值的中间的数将数组划分成两部分
-```java
-	/*378. Kth Smallest Element in a Sorted Matrix*/
-    public int kthSmallest(int[][] matrix, int k) {
-        int n = matrix.length;
-        int low = matrix[0][0],high = matrix[n-1][n-1];
-        while(low<=high){
-            int mid  = low+(high-low)/2;//注意：这里不能用(low+high)/2，因为溢出了
-            int count =  getLessEqual(matrix,mid);
-            if(count<k) low = mid +1;
-            else high = mid -1;
-        }
-        return low;
-    }
-    int getLessEqual(int[][] matrix,int val){
-        int n = matrix.length;
-        int i = n-1,j = 0,res = 0;
-        while(i>=0 && j<n){
-            if(matrix[i][j]>val) i--;
-            else{
-                res += i+1;//第j列的matrix[0][j]...matrix[i][j]都比val小
-                j++;
-            }
-            
-        }
-        return res;
-    }
-```
 
 ## [218. The Skyline Problem](https://leetcode.com/problems/the-skyline-problem/)
 - 三元组[Li,Ri,Hi]，Li和Ri为横坐标，Hi为高度，即x轴和Li到Ri范围内围成了一个矩形
