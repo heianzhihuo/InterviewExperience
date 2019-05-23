@@ -26,7 +26,41 @@
         return len;
     }
 ```
+ 
+## [128. Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/submissions/)
+- 最长连续元素序列
+- 给定一个无序数组，求这个数组中元素能够组成的最长的连续整数的长度
+- 示例：
+> Input:[100,4,200,1,3,2,1]\
+Output:4\
+Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
 
+```java
+	/*128. Longest Consecutive Sequence*/
+    public int longestConsecutive(int[] nums) {
+        if(nums.length==0)
+            return 0;
+        Arrays.sort(nums);
+        int cur,pre;
+        int max = 1;
+        int i;
+        pre = nums[0];
+        cur = pre+1;
+        for(i=1;i<nums.length;i++){
+            if(nums[i]==cur)
+                cur++;
+            else if(nums[i]>cur){
+                if(cur-pre>max)
+                    max = cur-pre;
+                pre = nums[i];
+                cur = pre+1;
+            }
+        }
+        if(cur-pre>max)
+            max = cur-pre;
+        return max;
+    }
+```
 
 ## [409. Longest Palindrome](https://leetcode.com/problems/longest-palindrome/)
 - 最长回文串，给定一个字符串s，求用s中字母能组成的最长回文串的长度
