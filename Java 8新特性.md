@@ -1,4 +1,4 @@
-#Java 8新特性详解
+# Java 8新特性详解
 
 以前从来没有关注过Java各个版本的特性，之前面试的时候被问到过Java版本的问题，现在，今天忽然发现了这个问题就在这里随便写一点，只是当个搬运工
 
@@ -91,7 +91,7 @@ public class Test{
 
 Java8的Lambda表达式其实和python的Lambda表达式是类似的，其本质是匿名函数。在实际中，我写的代码几乎没有涉及到Lambda表达式，同时在Java中也很少用到interface、final、abstract等关键字，对接口、抽象类的理解不是很深刻。
 
-2. 方法引用
+2. **方法引用**
 - 方法引用通过用方法的名字来指向一个方法。方法引用可以使语言的构造更紧凑简洁，减少冗余代码。下面是Car类定义了4个方法，来区分4种不同方法的引用。
 ```java
 @FunctionalInterface
@@ -143,7 +143,7 @@ public class Test{
 }
 ```
 
-3. 函数式接口
+3. **函数式接口**
 - 函数式接口就是仅有一个抽象方法，但是可以有多个非抽象方法的接口，函数式接口可以转换为Lambda表达式。可以用Lambda表达式来实现这个接口
 - Java8提供了一个特殊的注解@FunctionalInterface，Java库中所有相关接口都已经有该注解了
 - 函数式接口中允许定义默认方法，静态方法，java.lang.Object里的public方法
@@ -173,8 +173,8 @@ GreetingService greeetService1 = message->System.out.println("Hello "+message);
 	- java.lang.reflect.InvocationHandler
 	- java.util.function（JDK1.8新增的）
 
-由上面这个列表中可知，实现比较器的代码更简单了
-```
+由上面这个列表中可知，**实现比较器的代码更简单了**。这是新特性中可以应用的一点
+```java
 Class Person{
 	String name;
 	int age;
@@ -192,11 +192,11 @@ Comparator<Person> ageComparator1 = new Comparator<Person>() {
 };
 ```
 
-4. 接口的默认方法和静态方法
+4. **接口的默认方法和静态方法**
 - 接口可以有已经实现的方法，不需要实现类去实现其方法。当需要修改接口的时候，需要修改全部实现了该接口的类。默认方法可以使得开发者在不破坏二进制兼容性的前提下，往接口中添加新的方法。
 - 默认接口和静态方法的实例在上文中见interface GreetingService
 
-5. 重复注解
+5. **重复注解**
 - Java5引入了注解特性，但是Java5中的注解在同一个地方只能使用一次。Java 8打破了这个限制
 - Java5提供了3个内置注解
 	- @Override 意思是重写、覆盖，最长用到的注解
