@@ -2,9 +2,62 @@
 
 为了简单表示，不再复制题目，我简述题目要求即可
 
+## [Longest Word in Dictionary](https://leetcode.com/problems/longest-word-in-dictionary/)
+- 字典中最长单词
+- 给定一个字符串列表words，找到words中最长（如果长度相同，则返回字典序小）的字符串，该字符串每次能通过words中的某个字符串增加一个字符得到
+- 刚开始我的思路是按字典序排序，然后判断某个位置的字符串的前一个位置是否是它的前缀，但是这样的结果不对
+- 然后看解析发现用的是字典树，即Trie树，于是写了一个用HashMap作为索引的字典树，查找用的BFS，结果只超过37%的submit
+- 然后看最优解，用长度为26的数组来保存子节点，查找用的是DFS
+
+```java
+	/*720. Longest Word in Dictionary*/
+    public String longestWord(String[] words) {
+        Trie trie = new Trie();
+        for(String w:words)
+            trie.insert(w);
+        trie.dfs(trie.root,0);
+        return trie.res;
+    }
+    class TrieNode{
+        String word = "";
+        boolean isWord = false;
+        TrieNode children[] = new TrieNode[26];
+    }
+    class Trie{
+        TrieNode root = new TrieNode();
+        public void insert(String word){
+            TrieNode cur = root;
+            for(char c:word.toCharArray()){
+                int i = c-'a';
+                if(cur.children[i]==null){
+                    TrieNode newNode = new TrieNode();
+                    cur.children[i] = newNode;
+                    cur = newNode;
+                }else{
+                    cur = cur.children[i];  
+                }
+            }
+            cur.isWord = true;
+            cur.word = word;
+        }
+        int max = -1;
+        String res = "";
+        public void dfs(TrieNode node,int length){
+            for(int i=0;i<26;i++){
+                if(node.children[i]!=null && node.children[i].isWord)
+                    dfs(node.children[i],length+1);
+            }
+            if(length>max){
+                max = length;
+                res = node.word;
+            }
+        }
+    }
+```
+
 ## [300. Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/)
 - 最长递增子串
-- 
+
 ```java
 	public int lengthOfLIS(int[] nums) {
         int n = nums.length;
@@ -35,6 +88,13 @@
 Output:4\
 Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
 
+- 这使LeetCode中一道Hard的题，但是思路很简单，只需要对数组进行排序，然后按照思路处理即可，时间复杂度是O(nlogn)的，用排序的结果超过100%的提交
+- 唯一的疑问在于题目要求复杂度是O(n)
+- 看题解有三种思路
+	- 方法一：暴力搜索，时间复杂度O(n^3)
+	- 方法二：排序，时间复杂度O(nlogn)
+	- 方法三：HashSet，这里说时间复杂度是O(n)的，在方法3的代码中就是把数组中元素扔到HashSet中，然后遍历HashSet中的元素，方法和排序后判断方式基本相同。显然这里有一个前提假设是HashSet的插入是O(1)的，因此这里说时间复杂度为O(1)。然后我在看结果中的代码，实际上排序方法更快。
+	
 ```java
 	/*128. Longest Consecutive Sequence*/
     public int longestConsecutive(int[] nums) {
@@ -59,6 +119,72 @@ Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefor
         if(cur-pre>max)
             max = cur-pre;
         return max;
+    }
+```
+
+## [395. Longest Substring with At Least K Repeating Characters](https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/)
+- 求最长子串，在该子串中每个字符都至少出现K次
+- 我的思路找到该串中出现次数少于K次的字符，将这些字符移除后，形成了若干子串，在子串中递归求解子问题
+- 第一次实现时用的是HashMap，得到的结果是只超过60%的submits，然后改成了长度为26的数组，同时先判断是否所有字符出现的次数都大于等于k
+```java
+	/*395. Longest Substring with At Least K Repeating Characters*/
+	public int longestSubstring(String s, int k) {
+        int n = s.length();
+        if(k==0)
+            return n;//如果k<=1，显然任意字符串都成立
+        if(n<k)
+            return 0;//如果字符串长度小于K，没有这样的子串
+        int count[] = new int[26];
+        int i;
+        for(i=0;i<n;i++)
+            count[s.charAt(i)-'a']++;
+        boolean flag = true;
+        for(i=0;i<26;i++)
+            if(count[i]>0 && count[i]<k){
+                flag = false;
+                break;
+            }
+        if(flag) return n;
+        int pre=0,cur = 0,ret = 0;
+        while(cur<n){
+            if(count[s.charAt(cur)-'a']<k){
+                ret = Math.max(ret,longestSubstring(s.substring(pre,cur),k));
+                pre = cur+1;
+            }
+                
+            cur++;
+        }
+        ret = Math.max(ret,longestSubstring(s.substring(pre,cur),k));
+        return ret;
+    }
+```
+
+## [524. Longest Word in Dictionary through Deleting](https://leetcode.com/problems/longest-word-in-dictionary-through-deleting/)
+- 给定字符串s，和字符串集合d，求d一个字符串，该字符串能通过s删除若干字符得到，并且该字符串长度最长，且如果有相同长度的符号条件的字符串，则返回其中字典序最小的那个字符串
+- 刚开始的错误的以为直接统计字符串中字符出现次数，比较字符串的字符出现次数
+- 然后马上想到，其实就是找集合d中是字符串s的子串的字符串，并且使得该字符串长度最长字典序最小
+- 判断字符串t是否是字符串s的子串的方法：从字符串t的第0个位置的字符ch，找字符ch在s中最早出现的位置，然后从该位置开始，找t[1]最早出现的位置
+- 所以依次遍历d中每个字符串t，判断t是否是s的子串，再判断t是否长度大于最优解ret的长度，或者t的长度等于ret长度，且t的字典序比ret的字典序小。其中后面的条件可以放在前面。
+
+```java
+	/*524. Longest Word in Dictionary through Deleting*/
+	public String findLongestWord(String s, List<String> d) {
+        String ret = "";
+        for(String t:d){
+            if((t.length()>ret.length() || (t.length()==ret.length() && t.compareTo(ret)<0)) && isSubSequence(s,t))
+                ret = t;
+        }
+        return ret;
+    }
+    public boolean isSubSequence(String s,String t){
+        int i,j;
+        j = 0;
+        for(i=0;i<t.length();i++,j++){
+            for(;j<s.length() && s.charAt(j)!=t.charAt(i);j++);
+            if(j==s.length())
+                return false;
+        }
+        return true;
     }
 ```
 
