@@ -2,6 +2,129 @@
 
 为了简单表示，不再复制题目，我简述题目要求即可
 
+## [388. Longest Absolute File Path](https://leetcode.com/problems/longest-absolute-file-path/)
+- 用字符串来抽象文件系统
+- 字符串"dir\n\tsubdir1\n\tsubdir2\n\t\tfile.ext"表示
+> dir\
+    subdir1\
+    subdir2\
+        file.ext\
+- 字符串"dir\n\tsubdir1\n\t\tfile1.ext\n\t\tsubsubdir1\n\tsubdir2\n\t\tsubsubdir2\n\t\t\tfile2.ext"表示
+> dir\
+    subdir1\
+        file1.ext\
+        subsubdir1\
+    subdir2\
+        subsubdir2\
+            file2.ext\
+- 文件名至少包含一个.和扩展名，目录或子目录不包含.
+
+```java
+    public int lengthLongestPath(String input) {
+        int n = input.length();
+        if(n==0)
+            return 0;
+        Stack<Integer> stack = new Stack<>();
+        int max_length = 1;
+        int cur_length = 0;
+        int i = 0,j = n,k,a;
+        while(i<n){
+            j = input.indexOf('\n',i);
+            if(j==-1)
+                j = n;
+            for(k=0;k<j-i && input.charAt(i+k)=='\t';k++);
+            if(k<stack.size()){
+                for(a=i-2;a>=i-stack.peek() && input.charAt(a)!='.';a--);
+                if(a>=i-stack.peek() && cur_length>max_length) max_length = cur_length;
+                while(k<stack.size()) cur_length -= stack.pop()+1;
+            }
+            int t = j-i-k;
+            stack.add(t);
+            cur_length += t+1;
+            i = j+1;
+        }
+        for(a=i-2;a>=i-stack.peek() && input.charAt(a)!='.';a--);
+        if(a>=i-stack.peek() && cur_length>max_length) max_length = cur_length;
+		return max_length-1;
+    }
+```
+
+
+## [673. Number of Longest Increasing Subsequence](https://leetcode.com/problems/number-of-longest-increasing-subsequence/)
+- 最长递增子序列的数目
+- 求一个数组的最长递增子序列的数目
+- 动态规划
+
+```java
+    public int findNumberOfLIS(int[] nums) {
+        int n = nums.length;
+        if(n==0)
+            return 0;
+        int cnt[] = new int[n];
+        int len[] = new int[n];
+        int max = 1,ret = 1;
+        int i,j;
+        cnt[0] = 1;
+        len[0] = 1;
+        for(i=1;i<n;i++){
+            len[i] = 1;
+            cnt[i] = 1;
+            for(j=0;j<i;j++){
+                if(nums[i]>nums[j]){
+                    if(len[j]+1>len[i]){
+                        len[i] = len[j]+1;
+                        cnt[i] = cnt[j];
+                    }else if(len[j]+1==len[i])
+                        cnt[i] += cnt[j];
+                    
+                }
+            }
+            if(len[i]>max){
+                max = len[i];
+                ret = cnt[i];
+            }else if(len[i]==max)
+                ret += cnt[i];
+        }
+        return ret;
+    }
+```
+
+## [594. Longest Harmonious Subsequence](https://leetcode.com/problems/longest-harmonious-subsequence/)
+- 最长和谐子序列
+- 如果一个数组中的最大值和最小值的差为1，那么这个数组称为和谐数组
+- 求一个数组的最长和谐子数组
+- 这道题刚开始题意理解错误，误以为是最长连续子数组。然后，看到是子数组后，思路也不对，我的想法是统计每个数字出现的个数，然后排序，找相邻的数。
+- 更好的思路是直接对数组排序，然后统计相邻的数出现的个数，但是这里我理解错了，把和谐数组当成最大值和最小值差值小于等于1了。
+
+```java
+    public int findLHS(int[] nums) {
+        int n = nums.length;
+        if(n==0)
+            return 0;
+        Arrays.sort(nums);
+        int pre = -1,preCount = 0;
+        int cur,curCount;
+        int ret = 0,i;
+        cur = nums[0];
+        curCount = 1;
+        for(i=1;i<n;i++){
+            if(nums[i]==cur)
+                curCount++;
+            else{
+                if(cur-pre==1)
+                    ret = Math.max(ret,curCount+preCount);
+                pre = cur;
+                preCount = curCount;
+                cur = nums[i];
+                curCount = 1;
+            }
+        }
+        if(cur-pre==1)
+            ret = Math.max(ret,curCount+preCount);
+        return ret;
+    }
+```
+
 ## [300. Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/)
 - 最长递增子串
 - 
