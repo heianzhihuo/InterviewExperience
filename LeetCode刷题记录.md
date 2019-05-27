@@ -5,18 +5,22 @@
 ## [388. Longest Absolute File Path](https://leetcode.com/problems/longest-absolute-file-path/)
 - 用字符串来抽象文件系统
 - 字符串"dir\n\tsubdir1\n\tsubdir2\n\t\tfile.ext"表示
-> dir\
-    subdir1\
-    subdir2\
-        file.ext\
+```
+dir
+    subdir1
+    subdir2
+        file.ext
+```
 - 字符串"dir\n\tsubdir1\n\t\tfile1.ext\n\t\tsubsubdir1\n\tsubdir2\n\t\tsubsubdir2\n\t\t\tfile2.ext"表示
-> dir\
-    subdir1\
-        file1.ext\
-        subsubdir1\
-    subdir2\
-        subsubdir2\
-            file2.ext\
+```
+dir
+    subdir1
+        file1.ext
+        subsubdir1
+    subdir2
+        subsubdir2
+            file2.ext
+```
 - 文件名至少包含一个.和扩展名，目录或子目录不包含.
 
 ```java
