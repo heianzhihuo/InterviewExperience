@@ -2,6 +2,30 @@
 
 为了简单表示，不再复制题目，我简述题目要求即可
 
+## [646. Maximum Length of Pair Chain](https://leetcode.com/problems/maximum-length-of-pair-chain/)
+- 最长整数对链
+- 给定n个数对，每个数对的第一个数都小于第二个数，定义(c,d) can follow (a,b) 当且仅当 b<c
+- 找到数对集合中可以组成的最长链的长度
+- 贪心算法，任务调度问题，时间复杂度O(nlogn)
+
+```java
+    public int findLongestChain(int[][] pairs) {
+        int n = pairs.length;
+        if(n<=1)
+            return n;
+        Arrays.sort(pairs,(a,b)->a[0]-b[0]);//函数引用和Lambda表达式
+        int ret = 1;
+        int end = pairs[0][1];
+        for(int i=1;i<n;i++)
+            if(pairs[i][0]>end){
+                ret++;
+                end = pairs[i][1];
+            }else end = Math.min(end,pairs[i][1]);
+        return ret;
+    }
+```
+
+
 ## [388. Longest Absolute File Path](https://leetcode.com/problems/longest-absolute-file-path/)
 - 用字符串来抽象文件系统
 - 字符串"dir\n\tsubdir1\n\tsubdir2\n\t\tfile.ext"表示
