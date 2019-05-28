@@ -22,6 +22,7 @@ dir
             file2.ext
 ```
 - 文件名至少包含一个.和扩展名，目录或子目录不包含.
+- 这题的思路很简单，考察的是栈和字符串处理，难度不大，但是细节繁琐
 
 ```java
     public int lengthLongestPath(String input) {
@@ -53,7 +54,58 @@ dir
     }
 ```
 
+## [674. Longest Continuous Increasing Subsequence](https://leetcode.com/problems/longest-continuous-increasing-subsequence/)
+- 最长连续递增子序列
+- 这题思路很简单，直接遍历，记录到当前位置时递增序列的长度，如果A[i]>A[i-1],则cur加一，否则cur置为1
+```java
+    public int findLengthOfLCIS(int[] nums) {
+        int n = nums.length;
+        if(n==0)
+            return 0;
+        int ret = 1;
+        int cur = 1,i;
+        for(i=1;i<n;i++)
+            if(nums[i]>nums[i-1])
+                cur++;
+            else{
+                ret = Math.max(ret,cur);
+                cur = 1;
+            }
+        ret = Math.max(ret,cur);
+        return ret;     
+    }
+```
 
+## [1027. Longest Arithmetic Sequence](https://leetcode.com/problems/longest-arithmetic-sequence/)
+- 最长等差子序列
+- 给定一个数组A，求A的最长子数组，该子数组是一个等差数列
+- 动态规划，用dp[i][j]表示以A[i]结尾的，公差为j的最长等差序列的长度，dp[i][j] = dp[k][j]+1，其中A[k]+j=A[i]
+
+```java
+    public int longestArithSeqLength(int[] A) {
+        int n = A.length;
+        if(n==0)
+            return 0;
+        int max = A[0],min = A[0];
+        int i,j,k;
+        for(i=1;i<n;i++){
+            max = Math.max(max,A[i]);
+            min = Math.min(min,A[i]);
+        }
+        int dp[][] = new int[n][2*(max-min)+1];
+        int bias = max-min;
+        int ret = 1;
+        for(i=0;i<n;i++)
+            for(j=0;j<i;j++){
+                int d = A[i]-A[j]+bias;
+                if(dp[j][d]==0)
+                    dp[i][d] = 2;
+                else dp[i][d] = dp[j][d]+1;
+                ret = Math.max(ret,dp[i][d]);
+            }
+        return ret;
+    }
+```
 ## [673. Number of Longest Increasing Subsequence](https://leetcode.com/problems/number-of-longest-increasing-subsequence/)
 - 最长递增子序列的数目
 - 求一个数组的最长递增子序列的数目
