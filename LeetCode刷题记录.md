@@ -2,6 +2,38 @@
 
 为了简单表示，不再复制题目，我简述题目要求即可
 
+## [873. Length of Longest Fibonacci Subsequence](https://leetcode.com/problems/length-of-longest-fibonacci-subsequence/)
+- 最长斐波那契子序列的长度
+- 给定一个有序数组，求该数组的一个最长子序列，且该子序列是斐波那契数列
+- **动态规划**
+- 动态规划的问题在于找出最优子结构，这题想了挺久才想出来，刚开始思路不对
+- 刚开始的思路是用dp[i]表示以A[i]结尾的最长斐波那契数列的长度，但是，无论怎么样都没办法通过子问题求解原问题，即dp[i]不能用dp[0]-dp[i-1]表示，然后又在dp[i]上添加其他信息，dp[i]中存储以dp[i][0]表示长度，dp[i][1]表示前一个位置，即倒数第二个数。这个思路始终没有办法用子问题的解来表示原问题的解
+- 新的思路是dp[i][j]表示以A[i]、A[j]结尾的最长斐波那契数列的长度，于是dp[i][j] = dp[k][i]+1 if A[k] = A[j]-A[i]。通过这个方式可以用子问题求解原问题，而这种方法需要在数组A中查找A[j]-A[i]，对于每个(i,j)对二分查找的时间复杂度是O(logn)的，因此这种思路的时间复杂度是O(n^2logn)的。
+- 按照这种思路，写出来的代码超过20%的submit，显然还有更优的方法
+- 在所有submit中，最优的方法是，用HashMap来存储每个数的索引，同时dp[i][j]
+- 刚开始的思路不对的原因在于，只用结尾的数无法确定一个斐波那契数列。而新思路的核心在于，用了结尾的两个数来表示一个斐波那契数列。在我想到这个思路之前，我想到的是斐波那契数列数列只要确定了第1和第2个数，整个数列的结果都是确定的，那么只要求出以数组任意两个数开始的斐波那契数列的长度，这个方法的时间复杂度是O(n^3)的。
+- 所以问题的核心在于斐波那契数列有两个初值
+```java
+    public int lenLongestFibSubseq(int[] A) {
+        int n = A.length;
+        HashMap<Integer,Integer> index = new HashMap<>();
+        HashMap<Integer,Integer> longest = new HashMap<>();
+        int i,j;
+        int ret = 0;
+        for(i=0;i<n;i++)
+            index.put(A[i],i);
+        for(i=0;i<n-1;i++)
+            for(j=i+1;j<n;j++)
+                if(A[j]-A[i]<A[i] && index.containsKey(A[j]-A[i])){
+                    int k = index.get(A[j]-A[i]);
+                    int l = longest.getOrDefault(k*n+i,2)+1;
+                    longest.put(i*n+j,l);
+                    ret = Math.max(ret,l);
+                }
+        return ret;
+    }
+```
+
 ## [646. Maximum Length of Pair Chain](https://leetcode.com/problems/maximum-length-of-pair-chain/)
 - 最长整数对链
 - 给定n个数对，每个数对的第一个数都小于第二个数，定义(c,d) can follow (a,b) 当且仅当 b<c
@@ -25,6 +57,30 @@
     }
 ```
 
+
+## [925. Long Pressed Name](https://leetcode.com/problems/long-pressed-name/)
+- 在打字的时候可能会有时可能会因为长按导致某些字母重复
+- 判断字符串typed是否是是name long pressed-name
+- 思路很简单，一次进行字符计数，判断typed中字符数是否大于等于name中的
+```java
+    public boolean isLongPressedName(String name, String typed) {
+        int n1 = name.length(),n2 = typed.length();
+        int i = 0,j = 0;
+        while(true){
+            char ch = name.charAt(i);
+            int a = 0,b = 0;
+            for(;i<n1 && name.charAt(i)==ch;i++) a++;
+            for(;j<n2 && typed.charAt(j)==ch;j++) b++;
+            if(i==n1 && j==n2)
+                break;
+            if(i==n1 || j==n2)
+                return false;
+            if(b<a)
+                return false;
+        }
+        return true;
+    }
+```
 
 ## [388. Longest Absolute File Path](https://leetcode.com/problems/longest-absolute-file-path/)
 - 用字符串来抽象文件系统

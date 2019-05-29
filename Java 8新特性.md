@@ -18,7 +18,7 @@ Java 8是Java语言开发的一个主要版本，由Oracle公司于2014年3月18
 上面的都是废话，下面的才重点。
 
 ## Java 8的新特性
-1. **Lambda表达式**
+### 1 Lambda表达式
 - Lambda表达式，也称为闭包，**允许把函数作为一个方法的参数**(函数作为参数传递进方法中)，使用Lambda表达式可以使代码更简洁紧凑
 - Lambda表达式语法格式如下：
 ```
@@ -91,7 +91,7 @@ public class Test{
 
 Java8的Lambda表达式其实和python的Lambda表达式是类似的，其本质是匿名函数。在实际中，我写的代码几乎没有涉及到Lambda表达式，同时在Java中也很少用到interface、final、abstract等关键字，对接口、抽象类的理解不是很深刻。
 
-2. **方法引用**
+### 2 方法引用
 - 方法引用通过用方法的名字来指向一个方法。方法引用可以使语言的构造更紧凑简洁，减少冗余代码。下面是Car类定义了4个方法，来区分4种不同方法的引用。
 ```java
 @FunctionalInterface
@@ -143,7 +143,7 @@ public class Test{
 }
 ```
 
-3. **函数式接口**
+### 3 函数式接口
 - 函数式接口就是仅有一个抽象方法，但是可以有多个非抽象方法的接口，函数式接口可以转换为Lambda表达式。可以用Lambda表达式来实现这个接口
 - Java8提供了一个特殊的注解@FunctionalInterface，Java库中所有相关接口都已经有该注解了
 - 函数式接口中允许定义默认方法，静态方法，java.lang.Object里的public方法
@@ -192,11 +192,11 @@ Comparator<Person> ageComparator1 = new Comparator<Person>() {
 };
 ```
 
-4. **接口的默认方法和静态方法**
+## 4 接口的默认方法和静态方法
 - 接口可以有已经实现的方法，不需要实现类去实现其方法。当需要修改接口的时候，需要修改全部实现了该接口的类。默认方法可以使得开发者在不破坏二进制兼容性的前提下，往接口中添加新的方法。
 - 默认接口和静态方法的实例在上文中见interface GreetingService
 
-5. **重复注解**
+## 5 重复注解
 - Java5引入了注解特性，但是Java5中的注解在同一个地方只能使用一次。Java 8打破了这个限制
 - Java5提供了3个内置注解
 	- @Override 意思是重写、覆盖，最长用到的注解
@@ -205,8 +205,91 @@ Comparator<Person> ageComparator1 = new Comparator<Person>() {
 
 除了@Override之外，其它的注解几乎没有用到，而且@Override也是自动生成的，因此注解特性以及重复注解不怎么关注
 
-6. Stream
 
-7. Optional类
-8. Date/Time API
-9. Base64
+时隔好几天，终于开始更新下面的内容，怎么说呢，这些新特性实际中很少用到，比较常见的就是Lambda表达式了
+
+### 6 Stream
+- Steam API真正把函数式编程风格引入到Java中。Java 8 API添加了一个新的抽象称为流Stream，可以让你用一种声明的方式处理数据
+- 类似SQL语句从数据查询数据的直观方式来提供对Java集合运算的表达和告诫抽象
+- Stream(流)是一个来自数据源的元素队列并支持聚合操作
+    - 元素是特定类型的对象，形成一个队列
+    - 数据源
+    - 聚合操作
+    - Pipelining
+    - 内部迭代
+- 生成流
+```java
+List<String> strings = Arrays.asList("abc", "", "bc", "efg", "abcd","", "jkl");
+List<String> filtered = strings.stream().filter(string -> !string.isEmpty()).collect(Collectors.toList());
+```
+- forEach,用来迭代每个数据
+```java
+Random random = new Random();
+random.ints().limit(10).forEach(System.out::println);
+```
+- map,用于映射每个元素到对应的结果。以下代码片段使用map输出元素对应的平方数
+```java
+List<Integer> numbers = Arrays.asList(3, 2, 2, 3, 7, 3, 5);
+// 获取对应的平方数
+List<Integer> squaresList = numbers.stream().map( i -> i*i).distinct().collect(Collectors.toList());
+```
+- filter,用于通过设置的条件过滤出元素。以下代码片段使用filter过滤出空字符串
+```java
+List<String>strings = Arrays.asList("abc", "", "bc", "efg", "abcd","", "jkl");
+// 获取空字符串的数量
+int count = strings.stream().filter(string -> string.isEmpty()).count();
+```
+- limit,用于获取指定数量的流。以下代码片段使用limit方法打印出10条数据
+```java
+Random random = new Random();
+random.ints().limit(10).forEach(System.out::println);
+```
+- sorted,用于对流进行排序，以下代码片段使用sorted方法对输出的10个随机数进行排序
+```java
+Random random = new Random();
+random.ints().limit(10).sorted().forEach(System.out::println);
+```
+- 并行(parallel)程序,parallelStream是流并行处理程序的代替方法。
+```java
+List<String> strings = Arrays.asList("abc", "", "bc", "efg", "abcd","", "jkl");
+// 获取空字符串的数量
+int count = strings.parallelStream().filter(string -> string.isEmpty()).count();
+```
+- Collectors,实现了很多归约操作，例如将流转换成集合和聚合元素。
+```java
+List<String>strings = Arrays.asList("abc", "", "bc", "efg", "abcd","", "jkl");
+List<String> filtered = strings.stream().filter(string -> !string.isEmpty()).collect(Collectors.toList());
+ 
+System.out.println("筛选列表: " + filtered);
+String mergedString = strings.stream().filter(string -> !string.isEmpty()).collect(Collectors.joining(", "));
+System.out.println("合并字符串: " + mergedString);
+```
+- 统计,统计结果的收集器,主要用于int、double、long等基本类型上
+```java
+List<Integer> numbers = Arrays.asList(3, 2, 2, 3, 7, 3, 5);
+ 
+IntSummaryStatistics stats = numbers.stream().mapToInt((x) -> x).summaryStatistics();
+ 
+System.out.println("列表中最大的数 : " + stats.getMax());
+System.out.println("列表中最小的数 : " + stats.getMin());
+System.out.println("所有数之和 : " + stats.getSum());
+System.out.println("平均数 : " + stats.getAverage());
+```
+
+Stream API确实可以提高写代码的效率，干净、简洁。这一部分不太能理解，或者说不熟悉这种流式的数据处理方式，需要平时多用，平时可能很少用到吧。这个特性不知道怎么说，可能很快就忘记了。
+
+### 7 Optional类
+- Optional类是一个可以为null的容器对象。如果值存在则isPresent()方法会返回true，调用get()方法会返回该对象
+- Optional类的引入很好的解决空指针异常，不用显示进行空值检测
+
+还是一个看不懂的特性，几乎不会用到吧
+
+### 8 Date/Time API
+- Java 8的新发布的Date-Time API目的是加强对日期与时间的处理
+
+这个特性的意思就是说旧版的时间API非线程安全、设计很糟糕、没有时区支持，总之就是让我们用新的。这个特性可能有时需要用到
+
+### 9 Base64
+- Base64编码成为了Java类库的标准，提供了对URL、MIME友好的编码器与解码器
+
+编码这一块确实比较烦人
