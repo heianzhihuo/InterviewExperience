@@ -34,6 +34,50 @@
     }
 ```
 
+## [845. Longest Mountain in Array](https://leetcode.com/problems/longest-mountain-in-array/)
+- 数组中最长山峰
+- 给定一个数组A，B是A的连续子数组，如果B满足下列条件按则称B是mountain
+    - B.length>=3
+    - 存在0<i<B.length-1，使得B[0]<B[1]<...<B[i-1]>B[i+1]>B[i+1]>...>B[B.length-1]
+- 这题的思路很简单，就是记录之前的趋势是增长、减小还是不变，记录由增长到减小的区间长度
+- 这题写的代码思路不是很清晰，有点乱，细节有问题
+
+```java
+    public int longestMountain(int[] A) {
+        int n = A.length;
+        if(n<=2)
+            return 0;
+        int i;
+        int start = 0,d = 0;//d表示增长还是减小，还是不变
+        int ret = 0;
+        boolean flag = false;//表示从start到i是否出现了山顶
+        for(i=1;i<n;i++){
+            if(A[i]>A[i-1]){
+                if(d<=0){
+                    if(flag && i-start>=3 && i-start>ret) ret = i-start;
+                    start = i-1;
+                    d = 1;
+                    flag = false;
+                }
+            }else if(A[i]<A[i-1]){
+                if(d==1)
+                    flag = true;
+                d = -1;
+            }else{
+                if(d<0){
+                    if(flag && i-start>=3 && i-start>ret) ret = i-start;
+                    start = i-1;
+                    d = 1;
+                    flag = false;
+                }
+                d = 0;
+            }
+        }
+        if(flag && i-start>=3 && i-start>ret) ret = i-start;
+        return ret;
+    }
+```
+
 ## [646. Maximum Length of Pair Chain](https://leetcode.com/problems/maximum-length-of-pair-chain/)
 - 最长整数对链
 - 给定n个数对，每个数对的第一个数都小于第二个数，定义(c,d) can follow (a,b) 当且仅当 b<c
@@ -263,7 +307,7 @@ dir
 
 ## [300. Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/)
 - 最长递增子串
-- 
+- 求一个数组的最长递增子序列的长度
 ```java
 	public int lengthOfLIS(int[] nums) {
         int n = nums.length;
