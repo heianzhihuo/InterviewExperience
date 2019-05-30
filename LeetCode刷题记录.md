@@ -1,6 +1,41 @@
 # LeetCode刷题记录和总结
 
-为了简单表示，不再复制题目，我简述题目要求即可
+为了简单表示，不再复制题目，仅简述题目要求
+
+## [710. Random Pick with Blacklist](https://leetcode.com/problems/random-pick-with-blacklist/)
+- 给定一个黑名单B，数组B中包含区间[0,N)的整数，B中的数没有重复
+- 写一个随机函数，等概率的返回区间[0,N)中除去B中数后的任意一个数
+- 思路1：初始化的时候生成一个数组，把除数组B中的数都放到数组A中，pick的时候随机生成一个下标，从A中取数，这种思路的结果是pick时间复杂度为O(1)，效率高，但是初始化的效率很低，当N很大时，而数组B的长度很小时
+- 思路2：对数组B进行排序，从而将区间[0,N)的区间分成若干个小区间，随机生成一个数x，x落在某个区间则x的值加上相应的值，在查找区间的时候可以通过二分查找，因此初始化的时间复杂度是O(MlogM),M是数组B的长度，pick的时间复杂度是O(logM)
+```java
+	/*710. Random Pick with Blacklist*/
+	class Solution {
+	    int[] black;
+	    int N;
+	    public Solution(int N, int[] blacklist) {
+	        black = blacklist;
+	        Arrays.sort(black);
+	        for(int i=1;i<black.length;i++)
+	            black[i] -= i;
+	        this.N = N-black.length;
+	    }
+	    public int pick() {
+	        int x = (int)(Math.random()*N);
+	        int i=0,j = black.length-1;
+	        while(i<j){
+	            int mid = i+(j-i)/2;
+	            if(black[mid]>x)
+	                j = mid -1;
+	            else
+	                i = mid +1;
+	        }
+	        if(i<black.length && black[i]<=x)
+	            i++;
+	        return x+i;
+	    }
+	}
+```
+
 
 ## [Longest Word in Dictionary](https://leetcode.com/problems/longest-word-in-dictionary/)
 - 字典中最长单词
