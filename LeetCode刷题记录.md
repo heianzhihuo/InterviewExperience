@@ -2,6 +2,107 @@
 
 为了简单表示，不再复制题目，仅简述题目要求
 
+## [522. Longest Uncommon Subsequence II](https://leetcode.com/problems/longest-uncommon-subsequence-ii/submissions/)
+- 最长非公共子串
+- 给定一个字符串列表，求其中最长的非共子串。最长的非公共子串的定义是，这些字符串中某个字符串的最长子串，该子串不是其它任何字符串的子串
+- 这题的思路很简单，由于有上次后面的题的教训，看清题目要求后比较简单
+- 这题限定字符串列表中字符串长度不超过10，因此把所有具有相同长度的字符串放在同一个list中，然后从长度为10的字符串开始，对于字符串word，word显然不可能是长度比它短的字符串的子串，因此只需要遍历长度比它长的字符串，word是否是它们的子串。
+- 判断一个字符串是否是另一个字符串的子串的方式很简单，即判断一个字符串能否由另一个字符串删除若干字符串得到
+```java
+	public int findLUSlength(String[] strs) {
+        int n = strs.length;
+        int ret = -1,i,j,k,t;
+        List<String> []cache = new List[10];
+        for(i=0;i<10;i++)
+            cache[i] = new ArrayList<>();
+        for(i=0;i<n;i++)
+            cache[strs[i].length()-1].add(strs[i]);
+        for(i=9;i>=0;i--){
+            for(j=0;j<cache[i].size();j++){
+                boolean flag = true;
+                for(k=i;k<10;k++)
+                    for(t=0;flag && t<cache[k].size();t++)
+                        if(!(k==i && j==t) && isSubString(cache[i].get(j),cache[k].get(t)))
+                            flag = false;
+                if(flag)
+                    return i+1;
+            }
+        }
+        return -1;
+    }
+    boolean isSubString(String p,String t){
+        if(p.length()>t.length())
+            return false;
+        int i,j=0;
+        for(i=0;i<p.length();i++){
+            for(;j<t.length() && p.charAt(i)!=t.charAt(j);j++);
+            if(j==t.length())
+                return false;
+            j++;
+        }
+        return true;
+    }
+```
+
+## [1048. Longest String Chain](https://leetcode.com/problems/longest-string-chain/)
+- 最长字符串链
+- word1是word2的predecessor，当且仅当在word1的某个位置添加一个字符就和word2相等
+- 字符串链是字符串序列，[word_1,word_2,...word_k] k>=1, word_1是word_2的predecessor,word_2是word_3的predecessor.
+- 求给定字符串数组的最长字符串链
+- 本题是动态规划问题
+- 设dp[word_i]是以word结尾的最长字符串链，则dp[word_i] = max{dp[word_i-1]}+1, word_i-1是word_i的predecessor，i表示字符串长度
+- 刚开始我的思路是先对words数组按字符串长度排序，用HashMap记录每个字符串的最优解，按字符串长度从小到大依次计算，计算word的最优解时，遍历word的所有predecessor（方法是用substring，遍历删除各个位置），判断这个predecessor是不是在HashMap中。这个思路没有超时，但是只超过20%的submit
+- 看最优解的思路后，发现了一个新的问题，字符串的长度是有限的，所有字符串长度都在1-16之间。
+- 下一个思路，将相同长度的字符串放在同一个HashMap中，查找字符串word的predecessor（predecessor求解依然没变）时只需要在比word长度小1的HashMap中查找，这个方法超过70%的submit
+- 最终的思路，依然是将相同长度的字符串放在同一个list中，list[i]表示长度为i+1的字符串的列表，对于list[i]中的每个word，判断list[i-1]中的每个word1是否是word的predecessor
+
+```java
+	public int longestStrChain(String[] words) {
+        int n = words.length;
+        List<String> []cache = new List[16];
+        List<Integer> []longest = new List[16];
+        int i,j,k,ret = 1;
+        for(i=0;i<16;i++){
+            cache[i] = new ArrayList<>();
+            longest[i] = new ArrayList<>();
+        }
+        for(i=0;i<n;i++){
+            j = words[i].length();
+            cache[j-1].add(words[i]);
+            longest[j-1].add(1);
+        }
+        for(i=1;i<16;i++){
+            for(j=0;j<cache[i].size();j++){
+                int t = longest[i].get(j);
+                for(k=0;k<cache[i-1].size();k++){
+                    if(isMatch(cache[i].get(j),cache[i-1].get(k))){
+                        t = Math.max(t,longest[i-1].get(k)+1);
+                    }
+                }
+                longest[i].set(j,t);
+                ret = Math.max(ret,t);
+            }
+        }
+        return ret;
+    }
+    boolean isMatch(String p,String t){
+        boolean flag = true;
+        for(int i=0;i<t.length();i++)
+            if(flag){
+                if(p.charAt(i)!=t.charAt(i)){
+                    if(p.charAt(i+1)!=t.charAt(i))
+                        return false;
+                    flag = false;
+                }  
+            }else{
+                if(p.charAt(i+1)!=t.charAt(i))
+                    return false;
+            }
+        return true;
+    }
+```
+
+
 ## [710. Random Pick with Blacklist](https://leetcode.com/problems/random-pick-with-blacklist/)
 - 给定一个黑名单B，数组B中包含区间\[0,N)的整数，B中的数没有重复
 - 写一个随机函数，等概率的返回区间\[0,N)中除去B中数后的任意一个数
