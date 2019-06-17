@@ -114,11 +114,105 @@ JDK1.6之中引入了自适应的自旋锁。自适应自旋锁的改进就是�
 
 # Java线程池
 
-## 2.1 为什么要使用线程池
+## 2.1 说一说synchronized关键字和volatile关键字的区别
+- volatile关键字是线程同步的轻量级实现，所以volatile性能肯定比synchronized关键字要好。但是volatile关键字只能作用于变量，而synchronized关键字可以修饰方法及代码块。在JDK1.6后对synchronized关键字的优化，效率有了显著提升，实际开发中使用synchronized关键字的场景更多一些
+- 多线程访问volatile关键字不会发生阻塞，而synchronized关键字可能会发生阻塞
+- volatile关键字能保证数据的可见性，但不能保证数据的原子性。synchronized关键字两者都能保证
+- volatile关键字主要用于解决变量在多个线程之间的可见性，而synchronized关键字解决的是多个线程之间访问资源的同步性
+
+## 3.1 为什么要使用线程池
 - 降低资源消耗。通过重复利用已经创建的线程降低线程创建和销毁造成的消耗
 - 提高响应速度。当任务到达时，任务不需要等待线程创建就能立即执行
 - 提高线程的可管理性。线程是稀缺资源，如果无限制创建，不仅会消耗资源，还会降低系统的稳定性，使用线程池可以统一进行分配，调优和监控
 
-## 2.2 实现Runnable接口和Callable接口的区别
+## 3.2 实现Runnable接口和Callable接口的区别
 
 如果想让线程池执行任务需要实现Runnable接口或Callable接口。区别在于Runnable几口不会返回结果，但是Callable接口可以返回结果
+
+## 3.3 执行execute()方法和submit()方法的区别是什么呢？
+
+1. execute()方法适用于提交不需要返回值的任务，无法判断任务是否被线程池执行成功与否；
+2. submit()方法用于提交需要返回值的任务。线程池会返回一个future类型的对象，通过这个future对象可以判断任务是否执行成功，并且可以通过future的get()方法来获取返回值，get()方法会阻塞当前线程直到任务完成，而使用get(long timeout,TimeUnit unit)方法则会阻塞当前线程一段时间后立即返回，这时有可能任务没有执行完。
+
+## 3.4 如何创建线程池
+
+......
+
+# 信号量Semaphore
+
+Semaphore是一个计数信号量，它的本质是一个“共享锁”。信号量维护了一个信号量许可集合。线程通过调用acquire()来获取信号量的许可；当信号量中有可用的许可时，线程获取该许可；否则线程必须等待，直到有可用的许可位置。线程通过release()来释放它所持信号量的许可。
+
+通常把一个非负的整数称为Semaphore，表示为S。S可以理解为可用资源的数量，假定S>=0。
+S实现同步机制表示为PV原语句操作
+P(S):若S=0，线程进入等待队列；否则--S;
+V(S):++S，唤醒处于等待中的线程。
+
+```java
+public abstract class Semaphore{
+	private int value = 0;
+	
+	public Semaphore(){
+	}
+	
+	public Semaphore(int initial){
+		if(initial>=0)
+			value = initial;
+		else
+			throw new IllegalArgumentException("intial<0");
+	}
+	
+	public final synchronized void P() throws InterruptedException{
+		while(value==0)
+			wait();
+		value--;
+	}
+	
+	protected final synchronized void Vc(){
+		value++;
+		notifyAll();
+	}
+	
+	protected final synchronized void Vb(){
+		value++;
+		notifyAll();
+		if(value>1)
+			value = 1;
+	}
+	
+	public abstract void V();
+	
+	public String toString(){
+		return ".value="+value;
+	}
+
+}
+```
+
+
+# Atomic原子类
+
+## 5.1 原子类
+
+Atomic是指一个操作是不可中断的。
+
+## 5.3 AtomicInteger的使用
+
+AtomicInteger类主要利用CAS(compare and swap)+volatile和native方法来保证原子操作，从而避免synchronized的高开销，提高执行效率。
+
+CAS的原理是拿期望值和原本的值作比较，如果相同则更新成新的值。
+
+# AQS原理分析
+
+## AQS介绍
+
+AQS的全称为AbstractQueuedSynchronizer
+
+## 6.2 AQS原理分析
+
+AQS的核心思想是，如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并将共享资源设置为锁定状态。如果被请求的资源被占用，那么将暂时获取不到锁的线程加入到队列中。
+
+## 6.3 AQS资源共享的方式
+- Exclusive(独占):只有一个线程能执行
+	- 公平锁：按照线程在队列中的排队顺序，先到者先拿到锁
+	- 非公平锁：当线程要获取锁时，无视队列顺序直接去抢锁，谁抢到就是谁的
+- Share(共享)：多个线程可以同时执行。
