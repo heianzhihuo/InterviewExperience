@@ -128,3 +128,45 @@ void unlock(lock_t *mutex){
 
 Semaphore，信号量广泛应用于进程的或者线程的同步和互斥，信号量的本质是一个非负的整数计数器，它用来控制对公共资源的访问。
 PV原语是对信号量的操作，一次P操作使信号量减一，一次V操作使信号量加一。P操作对应于wait()，V操作对应于signal()
+
+
+```java
+public abstract class Semaphore{
+	private int value = 0;
+	
+	public Semaphore(){
+	}
+	
+	public Semaphore(int initial){
+		if(initial>=0)
+			value = initial;
+		else
+			throw new IllegalArgumentException("intial<0");
+	}
+	
+	public final synchronized void P() throws InterruptedException{
+		while(value==0)
+			wait();
+		value--;
+	}
+	
+	protected final synchronized void Vc(){
+		value++;
+		notifyAll();
+	}
+	
+	protected final synchronized void Vb(){
+		value++;
+		notifyAll();
+		if(value>1)
+			value = 1;
+	}
+	
+	public abstract void V();
+	
+	public String toString(){
+		return ".value="+value;
+	}
+
+}
+```
