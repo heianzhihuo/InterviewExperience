@@ -20,6 +20,7 @@ Java中的wait和sleep一直不会用，之前想用这个控制我写的声明�
 - 当某个线程执行wait后，在synchronized结束后，该线程持有的锁会被释放
 - wait()方法是Object类的方法
 - 线程执行到wait()方法后，它会进入到一个等待池
+- wait()方法不能在静态方法中调用
 
 ## Java中的yield方法
 
