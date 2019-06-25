@@ -2,6 +2,50 @@
 
 为了简单表示，不再复制题目，仅简述题目要求
 
+## [1092. Shortest Common Supersequence](https://leetcode.com/problems/shortest-common-supersequence/)
+- 最短公共超串
+- 给定字符串str1和字符串str2，返回一个最短的字符串，使得str1和str2都是这个字符串的子串
+- 最先想到的是最长公共子串，可以通过最长公共子串的问题来求解这个问题，先求出str1和str2的最长公共子串，并将子串在str1和str2中的位置标识出来，然后将str1和str2中非公共子串的字符和公共子串字符按顺序连接，即可得到最短公共超串
+- 类比最大公约数和最小公倍数
+
+```java
+	public String shortestCommonSupersequence(String str1, String str2) {
+        int n1 = str1.length();
+        int n2 = str2.length();
+        if(n1==0 || n2==0)
+            return str1+str2;
+        char char1[] = str1.toCharArray();
+        char char2[] = str2.toCharArray();
+        int dp[][] = new int[n1+1][n2+1];
+        int i,j;
+        for(i=0;i<n1;i++)
+            for(j=0;j<n2;j++){
+                dp[i+1][j+1] = Math.max(dp[i][j+1],dp[i+1][j]);
+                if(char1[i]==char2[j])
+                dp[i+1][j+1] = Math.max(dp[i+1][j+1],dp[i][j]+1);  
+            }
+        StringBuilder sb = new StringBuilder();
+        i = n1;j = n2;
+        char ch;
+        while(i>0 || j>0){
+            if(i==0 || (j>0 && dp[i][j]==dp[i][j-1])){
+                j--;
+                ch = char2[j];
+            }else if(j==0 || (i>0 && dp[i][j]==dp[i-1][j])){
+                i--;
+                ch = char1[i];
+            }else{
+                i--;
+                j--;
+                ch = char1[i];
+            }
+            sb.append(ch);
+        }
+        return sb.reverse().toString();   
+    }
+```
+
+
 ## [522. Longest Uncommon Subsequence II](https://leetcode.com/problems/longest-uncommon-subsequence-ii/submissions/)
 - 最长非公共子串
 - 给定一个字符串列表，求其中最长的非共子串。最长的非公共子串的定义是，这些字符串中某个字符串的最长子串，该子串不是其它任何字符串的子串
