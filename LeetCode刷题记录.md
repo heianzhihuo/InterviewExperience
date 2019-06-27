@@ -2,6 +2,155 @@
 
 为了简单表示，不再复制题目，仅简述题目要求
 
+## [514. Freedom Trail](https://leetcode.com/problems/freedom-trail/)
+- 在电子游戏中，给定一个字符串ring，另一个字符串key表示需要拼写的字符字符串
+- ring的第一个字符在12点方向，字符依次顺时针排列成一个圆
+- 每次可以顺时针或者逆时针旋转一次，使得字符移动一个位置
+- 求最小的操作次数，使得key中的每个字符能按次序出现在12点的位置
+- 动态规划问题
+
+```java
+	public int findRotateSteps(String ring, String key) {
+        nn = ring.length();
+        char chs[] = ring.toCharArray();
+        List<Integer> pos[] = new List[26];
+        for(int i=0;i<26;i++)
+            pos[i] = new ArrayList<>();
+        for(int i=0;i<n;i++)
+            pos[chs[i]-'a'].add(i);
+        HashMap<Integer,Integer> cur = new HashMap<>();
+        cur.put(0,0);
+        chs = key.toCharArray();
+        for(int i=0;i<chs.length;i++){
+            HashMap<Integer,Integer> next = new HashMap<>();
+            for(int x:pos[chs[i]-'a']){
+                next.put(x,Integer.MAX_VALUE);
+                for(int y:cur.keySet()){
+                    int t = cur.get(y)+distance(x,y);
+                    if(t<next.get(x))
+                        next.put(x,t);
+                }
+            }
+            cur = next;
+        }
+        int ret = Integer.MAX_VALUE;
+        for(int c:cur.values())
+            if(c<ret) ret = c;
+        return ret+key.length();
+    }
+    int nn;
+    int distance(int a,int b){
+        int z = Math.abs(a-b);
+        return Math.min(z,nn-z);
+    }
+```
+
+## [691. Stickers to Spell Word](https://leetcode.com/problems/stickers-to-spell-word/)
+
+```java
+	public int minStickers(String[] stickers, String target) {
+        if(stickers.length==0)
+            return -1;
+        HashMap<Character,Integer> tar = new HashMap<>();
+        for(int i=0;i<target.length();i++){
+            char ch = target.charAt(i);
+            tar.put(ch,tar.getOrDefault(ch,0)+1);
+        }
+        List<HashMap<Character,Integer>> table = new ArrayList<>();
+        for(String str:stickers){
+            HashMap<Character,Integer> temp = new HashMap<>();
+            for(int i=0;i<str.length();i++){
+                char ch = str.charAt(i);
+                temp.put(ch,temp.getOrDefault(ch,0)+1);
+            }
+            table.add(temp);
+        }
+        HashSet<HashMap<Character,Integer>> cur = new HashSet<>();
+        cur.add(tar);
+        int ret = 0;
+        while(!cur.isEmpty()){
+            HashSet<HashMap<Character,Integer>> next = new HashSet<>();
+            ret++;
+            for(HashMap<Character,Integer> temp:cur){
+                for(HashMap<Character,Integer> word:table){
+                    HashMap<Character,Integer> sum = sub(temp, word);
+                    if(!sum.equals(temp))
+                        next.add(sum);
+                    if(sum.isEmpty())
+                    	return ret;
+                }
+            }
+            cur = next;
+        }
+        return -1;
+    }
+    
+    HashMap<Character,Integer> sub(HashMap<Character,Integer> a,HashMap<Character,Integer> b){
+    	HashMap<Character,Integer> result = new HashMap<>();
+    	for(char c:a.keySet()) {
+    		int z = a.get(c)-b.getOrDefault(c,0);
+    		if(z>0)
+    			result.put(c,z);
+    	}
+    	return result;
+    }
+```
+
+
+## [354. Russian Doll Envelopes](https://leetcode.com/problems/russian-doll-envelopes/)
+- 俄罗斯套娃信封
+- 给定一组信封，每个信封用一组整数(w,h)表示，一个信封能放进另一个里面当且仅当w,h都大于另一个。问最多可以将多少个信封套在一起？
+- 这题我的思路是对width和height从小到大排序，一个信封肯定只能装进它后面的信封里，可以用动态规划求解，时间复杂度为O(n^2)，这个思路不会超时，但不是最好的解法
+- 解答中的方法是，对width从小到大排序，而height则从大到小排序，寻找高度递增的最大长度，这个方法的时间复杂度为O(nlogn)是最优解法
+
+```java
+	public int maxEnvelopes(int[][] envelopes) {
+        Comparator<int[]> comparator = (a,b)->a[0]==b[0]?b[1]-a[1]:a[0]-b[0];//这里使用了Lambda表达式和三元运算符
+        int n = envelopes.length;
+        if(n<=1) return n;
+        Arrays.sort(envelopes,comparator);
+        int dp[] = new int[n];
+        int len = 0;
+        for(int[] envelope:envelopes){
+            int index = Arrays.binarySearch(dp,0,len,envelope[1]);
+            if(index<0)
+                index = -(index+1);
+            dp[index] = envelope[1];
+            if(index==len)
+                len++;
+        }
+        return len;
+    }
+```
+
+## [304. Range Sum Query 2D - Immutable](https://leetcode.com/problems/range-sum-query-2d-immutable/)
+- 2维数组范围和查询
+- 给定一个二维数组矩阵，求两个给定点所围成的矩形范围内所有元素的和
+	- 1 假定矩阵不会改变
+	- 2 有很多个sumRegion查询请求
+	- 3 row1<row2 and col1<col2
+- 我的思路是直接保存矩阵，然后每次请求都计算两个点范围内的元素之和。这个方法的效率低，因为每次查询都是O(n)的
+- 这题和一维数组范围和查询类似，可以用dp[i][j]表示(0,0)到(i,j)的矩形内元素之和，从而sum(r1,c1,r2,c2) = dp[r2][c2]+dp[r1-1][c1-1]-dp[r2][c1-1]-dp[r1-1][c2]
+```java
+class NumMatrix {
+    int dp[][];
+    public NumMatrix(int[][] matrix) {
+        int m = matrix.length;
+        if(m==0) return;
+        int n = matrix[0].length;
+        dp = new int[m+1][n+1];
+        for(int i=0;i<m;i++)
+            for(int j=0;j<n;j++)
+                dp[i+1][j+1] = dp[i][j+1]+dp[i+1][j]-dp[i][j]+matrix[i][j];
+    }
+    
+    public int sumRegion(int row1, int col1, int row2, int col2) {
+        return dp[row2+1][col2+1]+dp[row1][col1]-dp[row2+1][col1]-dp[row1][col2+1];
+    }
+}
+```
+
+
 ## [1092. Shortest Common Supersequence](https://leetcode.com/problems/shortest-common-supersequence/)
 - 最短公共超串
 - 给定字符串str1和字符串str2，返回一个最短的字符串，使得str1和str2都是这个字符串的子串
