@@ -8,7 +8,6 @@
 - 每次可以顺时针或者逆时针旋转一次，使得字符移动一个位置
 - 求最小的操作次数，使得key中的每个字符能按次序出现在12点的位置
 - 动态规划问题
-
 ```java
 	public int findRotateSteps(String ring, String key) {
         nn = ring.length();
