@@ -21,6 +21,29 @@
     }
 ```
 
+## [80. Remove Duplicates from Sorted Array II](https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/)
+- 移除有序数组中的重复数字，保证每个数字至多出现两次，要求不用额外空间，O(n)时间
+- 这题和上一题很类似，只需要再用一个flag标记变量表示当前数字是否出现过
+```java
+	public int removeDuplicates(int[] nums) {
+        int n = nums.length;
+        if(n==0)
+            return n;
+        int i=0,j,flag = 1;
+        for(j=1;j<n;j++)
+            if(nums[j]!=nums[i]){
+                i++;
+                nums[i] = nums[j];
+                flag = 1;
+            }else if(flag==1){
+                i++;
+                nums[i] = nums[j];
+                flag = 2;
+            }
+        return i+1;
+    }
+```
+
 
 ## [514. Freedom Trail](https://leetcode.com/problems/freedom-trail/)
 - 在电子游戏中，给定一个字符串ring，另一个字符串key表示需要拼写的字符字符串
