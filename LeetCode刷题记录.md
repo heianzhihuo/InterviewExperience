@@ -2,6 +2,26 @@
 
 为了简单表示，不再复制题目，仅简述题目要求
 
+## [26. Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/submissions/)
+- 移除有序数组中的重复数字，要求不用额外空间，O(n)时间
+- 这是一道很简单的题目，只需要用两个位置标记i,j，j表示正在处理位置，在j之后的还未处理，而i是已经处理的，即到位置i的所有数都是不重复的
+
+```java
+	public int removeDuplicates(int[] nums) {
+        int n = nums.length;
+        if(n==0)
+            return n;
+        int i = 0,j;
+        for(j=1;j<n;j++)
+            if(nums[j]!=nums[i]){
+                i++;
+                nums[i] = nums[j];
+            }
+        return i+1;
+    }
+```
+
+
 ## [514. Freedom Trail](https://leetcode.com/problems/freedom-trail/)
 - 在电子游戏中，给定一个字符串ring，另一个字符串key表示需要拼写的字符字符串
 - ring的第一个字符在12点方向，字符依次顺时针排列成一个圆
