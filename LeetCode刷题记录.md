@@ -1,6 +1,73 @@
 # LeetCode刷题记录和总结
 
 为了简单表示，不再复制题目，仅简述题目要求
+## [60. Permutation Sequence](https://leetcode.com/problems/permutation-sequence/)
+- 集合[1,2,3,...,n]有n!个不同的排列
+- 给定n，求集合中按字典序的第k个排列
+- 思路：这题有点难想到，我最先想到的办法是用下面的nextPermeation的方法求，但是这种方法效率很低
+- 更好的思路是：首先，以任意一个元素开头的排列数都是(n-1)!个
+	- 以1开头，K最小为1，最大为(n-1)!-1
+	- 以2开头，K最小为(n-1)!，最大为2*(n-1)!-1
+	...
+	- 同理，以n开头，K最小为(n-1)*(n-1)!，最大为n!-1
+- 通过上面的思路，可以先确定第K个排列的开头为(K-1)/(n-1)!+1
+- 然后继续再剩下的元素中，找到开头的元素
+```java
+	public String getPermutation(int n, int k) {
+        int f[] = new int[n+1];
+        int s = 1;
+        f[0] = 1;
+        int i;
+        for(i=1;i<=n;i++){
+            s*=i;
+            f[i] = s;
+        }
+        if(k>s)
+            return null;
+        List<Integer> list = new ArrayList<>();
+        for(i=0;i<n;i++)
+            list.add(i+1);
+        StringBuilder sb = new StringBuilder();
+        for(i=1;i<=n;i++){
+            int index = (k-1)/f[n-i];
+            sb.append(list.get(index));
+            list.remove(index);
+            k = k-index*f[n-i];
+        }
+        return sb.toString();
+    }
+```
+
+## [31. Next Permutation](https://leetcode.com/problems/next-permutation/)
+- 下一个排列
+- 找到数组num的下一个字典序比num大的排列，如果num是字典序最大的排列，则返回字典序最小的排列
+- 要求必须在内部交换，用常数的内存
+- 思路：从数组最右边开始查找，第一个下降的位置，然后找到该位置左侧的所有数中第一个比这个数大的数，交换这两个数，然后再将左侧的数逆序，即可得下一个排列
+```java
+	public void nextPermutation(int[] nums) {
+        int n = nums.length;
+        if(n<=1)
+            return;
+        int i,j;
+        for(i=n-1;i>=1;i--)
+            if(nums[i]>nums[i-1])
+                break;
+        if(i!=0){
+            for(j=n-1;j>i;j--)
+                if(nums[j]>nums[i-1])
+                    break;
+            int tmp = nums[j];
+            nums[j] = nums[i-1];
+            nums[i-1] = tmp;
+        }
+        for(j=0;i+j<n-j-1;j++){
+            int tmp = nums[i+j];
+            nums[i+j] = nums[n-j-1];
+            nums[n-j-1] = tmp;
+        }
+        return;
+    }
+```
 
 ## [26. Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/submissions/)
 - 移除有序数组中的重复数字，要求不用额外空间，O(n)时间
