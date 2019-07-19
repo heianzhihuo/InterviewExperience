@@ -38,3 +38,36 @@ static int hash(Object x){
 - 扩容：段内扩容（段内元素超过该段对应Entry数组长度的75%触发扩容，不会对整个Map进行扩容），插入前检测需不需扩容，避免无效扩容
 - **锁分段技术**：首先将数据分成一段一段的存储，然后给每一段数据一把锁
 - HashTable的替代
+
+## ConcurrentHashMap
+
+[参考文章](https://blog.csdn.net/bill_xiang_/article/details/81122044)
+
+这里对ConcurrentHashMap再做个总结，因为前面写的不够全面，而且在新的Java版本中，分段锁的实现方式已经被摒弃了。
+
+ConcurrentHashMap从JDK1.5开始随java.util.concurrent包一起引入JDK中，解决了HashMap线程不安全和HashTable效率不高的问题。
+
+在JDK1.7之前，ConcurrentHashMap使用分段锁机制实现，JDK1.8则使用数组+链表+红黑树和CAS原子操作实现。
+
+1. ConcurrentHashMap的实现——JDK7版本
+	
+	分段锁机制
+	
+	HashTable效率低下的主要原因是因为其实现使用了synchronized关键字对put等操作进行加锁，synchronized关键字是对整个对象进行加锁，也就是说在进行put等修改Hash表操作时，锁住了整个Hash表，从而使其表现的效率低下。因此，在JDK1.5~1.7版本，Java使用了分段锁机制实现ConcurrentHashMap。
+	
+	ConcurrentHashMap在对象中保存了一个Segment数组，即将整个Hash表划分为多个段；每个Segment元素，即每个分类则像是一个HashTable；这样，执行put操作时，首先根据hash算法定位元素属于哪个Segment，然后对这个Segment加锁即可。因此，ConcurrentHashMap可以实现多线程put操作。
+	
+	get操作不加锁
+	
+2. ConcurrentHashMap的实现——JDK8版本
+
+	JDK1.7中ConcurrentHashMap是通过分段锁实现的，其最大并发度受到Segment的个数限制。因此在JDK1.8中，采用数组+链表+红黑树实现，加锁则采用CAS和synchronized实现。
+	
+	CAS原理
+	
+	锁一般分为悲观锁和乐观锁，Java中，悲观锁的实现方式是各种锁；而乐观锁则是通过CAS实现的。
+	
+	CAS操作存在一些缺点：1.存在ABA问题，其解决思路是使用版本号；2.循环时间长，开销大；3.只能保证一个共享变量的原子操作。
+	
+	
+	

@@ -58,9 +58,11 @@ public class Singleton {
 				}
 			}
 		}
+		return uniqueInstance;
 	}
 }
-```
+
+
 这里要注意，uniqueInstance采用volatile关键字修饰，这是很有必要的，uniqueInstance = new Singleton();这段代码其实分为三步执行：
 1. 为uniqueInstance分配内存空间
 2. 初始化uniqueInstance
