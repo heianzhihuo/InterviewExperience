@@ -43,6 +43,7 @@ synchronized关键字解决的是多线程之间访问资源的同步性，synch
 
 双重校验锁实现单例模式
 ```java
+<<<<<<< HEAD
 public class Singleton {
 	private volatile static Singleton uniqueInstance;
 	private Singleton(){
@@ -62,6 +63,11 @@ public class Singleton {
 	}
 }
 
+
+=======
+
+
+```
 
 这里要注意，uniqueInstance采用volatile关键字修饰，这是很有必要的，uniqueInstance = new Singleton();这段代码其实分为三步执行：
 1. 为uniqueInstance分配内存空间
@@ -129,7 +135,9 @@ JDK1.6之中引入了自适应的自旋锁。自适应自旋锁的改进就是�
 
 ## 3.2 实现Runnable接口和Callable接口的区别
 
-如果想让线程池执行任务需要实现Runnable接口或Callable接口。区别在于Runnable几口不会返回结果，但是Callable接口可以返回结果
+
+如果想让线程池执行任务需要实现Runnable接口或Callable接口。区别在于Runnable接口不会返回结果，但是Callable接口可以返回结果
+
 
 ## 3.3 执行execute()方法和submit()方法的区别是什么呢？
 
