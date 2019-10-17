@@ -1,6 +1,44 @@
 # LeetCode刷题记录和总结
 
 为了简单表示，不再复制题目，仅简述题目要求
+
+## [下一个排列](https://leetcode-cn.com/problems/next-permutation/submissions/)
+- 实现获取下一个排列的函数，算法要将给定的数字序列重新排列成字典序中下一个更大的排列。如果不存在，则将数字重新排列成最小的排列，即升序排列。
+
+- 要求：必须原地修改，只允许使用额外常数空间。
+- 示例：
+> 1,2,3 -> 1,3,2
+> 3,2,1 -> 1,2,3
+> 1,1,5 -> 1,5,1
+
+- 思路
+
+这里提供一个简单的思路，不妨设数组为A[0..n-1]，不妨A[i]>A[i-1]，从对于任意i<j<n，A[j-1]>=A[j]，即A[i...n-1]子数组是一个单调减子数组，那么A的下一个全排列中的前i-2个数和A相同，而后面的全排列等于子数组A[i-1,...n-1]的下一个全排列
+
+- 示例代码：
+```java
+class Solution {
+    public void nextPermutation(int[] nums) {
+        int n = nums.length;
+        if(n<=1) return;
+        int i;
+        for(i=n-1;i>0;i--)
+            if(nums[i]>nums[i-1]) break;
+        Arrays.sort(nums,i,n);//这里可以直接逆序即可，无需用排序算法
+        if(i==0) return;
+        for(int j=i;j<n;j++)
+            if(nums[j]>nums[i-1]){
+                int tmp = nums[j];
+                nums[j] = nums[i-1];
+                nums[i-1] = tmp;
+                break;
+            }
+        
+    }
+}
+```
+
+
 ## [60. Permutation Sequence](https://leetcode.com/problems/permutation-sequence/)
 - 集合[1,2,3,...,n]有n!个不同的排列
 - 给定n，求集合中按字典序的第k个排列
